@@ -1,0 +1,345 @@
+:root {
+    --primary-color: #3498db;
+    --bg-color: #f4f4f9;
+    --text-color: #333;
+    --card-bg: #fff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Ensure Result Screen Scrolls */
+#result-screen {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease;
+    background: var(--bg-color);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.screen.active {
+    opacity: 1;
+    z-index: 10;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Start Screen */
+#emoji-selector {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.emoji-option {
+    font-size: 2.5rem;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 10px;
+    background: var(--card-bg);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s, background 0.2s;
+    text-align: center;
+}
+
+.emoji-option:hover {
+    transform: scale(1.1);
+}
+
+.emoji-option.selected {
+    background: #d4e6f1;
+    border: 2px solid var(--primary-color);
+}
+
+button {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+    background: #2980b9;
+}
+
+/* Quiz Screen */
+#quiz-screen {
+    justify-content: flex-start;
+    padding: 0;
+}
+
+.map-container {
+    width: 100%;
+    height: 50vh;
+    position: relative;
+    background: #ccc;
+    overflow: hidden;
+    border-bottom: 2px solid #ddd;
+}
+
+#map-viewport {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    cursor: grab;
+}
+
+#map-viewport:active {
+    cursor: grabbing;
+}
+
+#map-content {
+    position: absolute;
+    transform-origin: 0 0; /* Important for coordinate mapping */
+    /* Width and Height set by JS to match image */
+}
+
+#map-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+#player-marker {
+    position: absolute;
+    /* Emoji Size Adjustment: ~1/4 of grid cell */
+    font-size: 60px;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    
+    transform: translate(-50%, -50%);
+    transition: top 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), left 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 100;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.8));
+    pointer-events: none;
+}
+
+.map-controls {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 101;
+}
+
+.map-controls button {
+    padding: 5px 10px;
+    font-size: 1.2rem;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.question-container {
+    width: 100%;
+    height: 50vh;
+    padding: 20px;
+    background: var(--card-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+    z-index: 5;
+    overflow-y: auto;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #eee;
+    border-radius: 3px;
+    margin-bottom: 15px;
+}
+
+#progress-fill {
+    height: 100%;
+    background: var(--primary-color);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+#question-text {
+    font-size: 1.15rem; /* Slightly smaller to fit longer questions */
+    margin-bottom: 20px;
+    text-align: justify;
+    line-height: 1.5;
+    max-width: 700px;
+}
+
+.answers-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    width: 100%;
+    max-width: 700px;
+}
+
+.answer-btn {
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    color: #444;
+    display: flex;
+    align-items: center;
+}
+
+.answer-btn:hover {
+    background: #e3f2fd;
+    border-color: var(--primary-color);
+    transform: translateX(5px);
+}
+
+/* Result Screen */
+#result-screen {
+    padding: 40px 20px;
+    width: 100%;
+    height: 100%;
+    z-index: 20; /* Ensure on top */
+    background: var(--bg-color);
+}
+
+.result-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#result-ideology-name {
+    font-size: 2.2rem;
+    color: var(--primary-color);
+    margin: 10px 0;
+}
+
+/* Ball Crop Display */
+.result-ball-container {
+    width: 200px;
+    height: 200px;
+    margin: 20px auto;
+    border-radius: 50%;
+    border: 5px solid var(--primary-color);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    background-color: #eee;
+}
+
+#result-ball-image {
+    /* Background image set via JS */
+    width: 100%;
+    height: 100%;
+    background-size: 0 0; /* Will be set dynamically */
+    background-repeat: no-repeat;
+}
+
+.result-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: grid;
+    gap: 20px;
+}
+
+.result-card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.result-card h3 {
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.result-card ul {
+    list-style-position: inside;
+    line-height: 1.6;
+}
+
+.quote-item {
+    margin-bottom: 15px;
+    font-style: italic;
+    border-left: 3px solid var(--primary-color);
+    padding-left: 10px;
+}
+
+.quote-source {
+    display: block;
+    font-style: normal;
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+    #quiz-screen {
+        flex-direction: row;
+    }
+    .map-container, .question-container {
+        width: 50%;
+        height: 100vh;
+    }
+    .map-container {
+        border-right: 2px solid #ddd;
+        border-bottom: none;
+    }
+}
